@@ -5,8 +5,8 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <SignedIn>
-      <UserButton />
-    </SignedIn>
+    <div>
+      dashboardPage
+    </div>
   );
 }
