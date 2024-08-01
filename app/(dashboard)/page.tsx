@@ -1,12 +1,9 @@
-import { SignedIn, UserButton } from "@clerk/nextjs";
-
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
+'use client'
 
 export default function Home() {
   return (
     <div>
-      dashboardPage
+      Home page
     </div>
-  );
+  )
 }
