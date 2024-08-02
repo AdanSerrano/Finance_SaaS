@@ -6,7 +6,7 @@ import {
 import { Inter } from "next/font/google";
 import type { Metadata } from "next";
 import { Providers } from "@/providers/query-provider";
-import { SheetProvider } from "@/features/accounts/components/sheet-provider";
+import { SheetProvider } from "@/providers/sheet-provider";
 import { Toaster } from '@/components/ui/sonner'
 
 const inter = Inter({ subsets: ["latin"] });

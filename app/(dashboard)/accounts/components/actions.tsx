@@ -1,0 +1,42 @@
+'use client'
+
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
+import { Edit, MoreHorizontal } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu"
+import { useOpenAccount } from "@/features/accounts/hooks/use-open-account"
+
+interface Props {
+    id: string
+}
+
+export const Actions = ({ id }: Props) => {
+    const { onOpen } = useOpenAccount()
+
+
+
+    return (
+        <>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button
+                        variant={'ghost'}
+                        className="size-8 p-0"
+                    >
+                        <MoreHorizontal className="size-4 " />
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                        disabled={false}
+                        onClick={() => onOpen(id)}
+                    >
+                        <Edit className="size-4 mr-2" />
+                        Edit
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+        </>
+    )
+}

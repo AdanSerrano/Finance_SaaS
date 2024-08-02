@@ -31,7 +31,9 @@ import {
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
+import { MixerHorizontalIcon } from "@radix-ui/react-icons"
 import { Trash } from "lucide-react"
+import { UseConfirm } from "@/hooks/use-confirm"
 import { useState } from "react"
 
 interface DataTableProps<TData, TValue> {
@@ -49,6 +51,10 @@ export function DataTable<TData, TValue>({
     onDelete,
     disabled,
 }: DataTableProps<TData, TValue>) {
+    const [ConfirmDialog, confirm] = UseConfirm(
+        "Delete",
+        "Are you sure you want to delete the selected rows?"
+    )
     const [sorting, setSorting] = useState<SortingState>([])
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
         []
@@ -78,6 +84,7 @@ export function DataTable<TData, TValue>({
 
     return (
         <div>
+            <ConfirmDialog />
             <div className="flex items-center py-4 gap-2">
                 <Input
                     placeholder={`Filter ${filterKey}...`}
@@ -90,7 +97,8 @@ export function DataTable<TData, TValue>({
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="ml-auto">
-                            Columns
+                            <MixerHorizontalIcon className="mr-2 size-4" />
+                            View
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
@@ -119,7 +127,14 @@ export function DataTable<TData, TValue>({
                     <Button
                         variant="outline"
                         className="font-normal text-sm"
-                        onClick={() => onDelete(table.getFilteredSelectedRowModel().rows)}
+                        onClick={async () => {
+                            const ok = await confirm()
+                            if (ok) {
+                                onDelete(table.getFilteredSelectedRowModel().rows)
+                                table.resetRowSelection()
+                            }
+                        }}
+
                         disabled={disabled}
                     >
                         <Trash className="size-4 mr-2" />

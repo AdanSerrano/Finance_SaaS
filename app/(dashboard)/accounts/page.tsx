@@ -1,42 +1,41 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Payment, columns } from '@/app/(dashboard)/accounts/components/columns'
+import { Loader2, Plus } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { DataTable } from '@/components/data-table'
-import { Plus } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
+import { columns } from '@/app/(dashboard)/accounts/components/columns'
+import { useBulkDeleteAccounts } from '@/features/accounts/api/use-bulk-delete'
+import { useGetAccounts } from '@/features/accounts/api/use-get-accounts'
 import { useNewAccount } from '@/features/accounts/hooks/use-new-account'
-
-async function getData(): Promise<Payment[]> {
-    // Fetch data from your API here.
-    return [
-        {
-            id: "728ed52f",
-            amount: 100,
-            status: "pending",
-            email: "m@example.com",
-        },
-        // ...
-    ]
-}
-const data: Payment[] = [
-    {
-        id: "728ed52f",
-        amount: 100,
-        status: "pending",
-        email: "m@example.com",
-    },
-    {
-        id: "asdfadsf",
-        amount: 100,
-        status: "success",
-        email: "adads@example.com",
-    },
-]
 
 export default function AccountsPage() {
     const newAccount = useNewAccount();
+    const deleteAccounts = useBulkDeleteAccounts()
+    const accountsQuery = useGetAccounts()
+    const accounts = accountsQuery.data || []
+
+    const isDisabled = deleteAccounts.isPending || accountsQuery.isLoading
+
+    if (accountsQuery.isLoading) {
+        return (
+            <div className='max-w-screen-2xl mx-auto w-full pb-10 -mt-24'>
+                <Card className='!border-none !drop-shadow-xs'>
+                    <CardHeader >
+                        <Skeleton className='h-8 w-48' />
+                    </CardHeader>
+                    <CardContent>
+                        <div className='h-[500px] w-full flex items-center justify-center'>
+                            <Loader2 className='size-6 text-slate-300 animate-spin' />
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        )
+    }
+
     return (
         <div className='max-w-screen-2xl mx-auto w-full pb-10 -mt-24'>
             <Card className='!border-none !drop-shadow-xs'>
@@ -55,10 +54,13 @@ export default function AccountsPage() {
                 <CardContent>
                     <DataTable
                         columns={columns}
-                        data={data}
-                        filterKey='email'
-                        onDelete={() => { }}
-                        disabled={false}
+                        data={accounts}
+                        filterKey='name'
+                        onDelete={(row) => {
+                            const ids = row.map((r) => r.original.id)
+                            deleteAccounts.mutate({ ids })
+                        }}
+                        disabled={isDisabled}
                     />
                 </CardContent>
             </Card>

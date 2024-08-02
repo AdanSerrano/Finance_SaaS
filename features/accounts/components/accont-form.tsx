@@ -1,3 +1,5 @@
+'use client'
+
 import {
     Form,
     FormControl,
@@ -9,7 +11,6 @@ import {
 } from "@/components/ui/form"
 
 import { Button } from "@/components/ui/button"
-import { FormValue } from 'hono/types'
 import { Input } from "@/components/ui/input"
 import React from 'react'
 import { Trash } from 'lucide-react'
@@ -49,12 +50,8 @@ export const AccountForm = ({ id, defaultValues, onSubmit, onDelete, disabled }:
 
     return (
         <>
-
             <Form {...form}>
-                <form
-                    onSubmit={form.handleSubmit(handleSubmit)}
-                    className="space-y-4 pt-4"
-                >
+                <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col gap-2">
                     <FormField
                         control={form.control}
                         name="name"
@@ -72,28 +69,25 @@ export const AccountForm = ({ id, defaultValues, onSubmit, onDelete, disabled }:
                             </FormItem>
                         )}
                     />
-
-                    <div className="my-4">
+                    <Button
+                        disabled={disabled}
+                        className="w-full"
+                    >
+                        {id ? 'Save Changes' : 'Create Account'}
+                    </Button>
+                    {!!id && (
                         <Button
+                            type='button'
                             disabled={disabled}
+                            onClick={handleDelete}
                             className="w-full"
+                            variant={'outline'}
+                            size={'icon'}
                         >
-                            {id ? 'Saves Change' : 'Create Account'}
+                            <Trash className="size-4 mr-2" />
+                            Delete Account
                         </Button>
-                        {!!id && (
-                            <Button
-                                type='button'
-                                disabled={disabled}
-                                onClick={handleDelete}
-                                className="w-full"
-                                variant={'outline'}
-                                size={'icon'}
-                            >
-                                <Trash className="size-4 mr-2" />
-                                delete account
-                            </Button>
-                        )}
-                    </div>
+                    )}
                 </form>
             </Form>
         </>
