@@ -217,6 +217,31 @@ const app = new Hono()
             return c.json({ data })
         }
     )
+    .post('/bulk-create',
+        clerkMiddleware(),
+        zValidator('json',
+            z.array(insertTransactionsSchemas.omit({ id: true }))
+        ),
+        async (c) => {
+            const auth = getAuth(c);
+            const values = c.req.valid('json');
+
+            if (!auth?.userId) {
+                throw new HTTPException(401, {
+                    res: c.json({ error: 'Unauthorized' }, 401),
+                })
+            }
+
+            const data = await db.insert(transactions).values(
+                values.map((value) => ({
+                    id: createId(),
+                    ...value,
+                }))
+            ).returning()
+
+            return c.json({ data })
+        }
+    )
     .post('/bulk-delete',
         clerkMiddleware(),
         zValidator('json',
