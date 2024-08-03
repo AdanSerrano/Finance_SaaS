@@ -10,8 +10,7 @@ import { z } from 'zod';
 import { zValidator } from '@hono/zod-validator';
 
 const app = new Hono()
-    .get(
-        '/',
+    .get('/',
         clerkMiddleware(),
         async (c) => {
             const auth = getAuth(c);
@@ -28,58 +27,6 @@ const app = new Hono()
             })
                 .from(categories)
                 .where(eq(categories.userId, auth.userId))
-            return c.json({ data })
-        })
-    .post('/',
-        clerkMiddleware(),
-        zValidator('json', insertCategorieSchema.pick({ name: true })),
-        async (c) => {
-            const auth = getAuth(c);
-
-            const value = c.req.valid('json');
-            if (!auth?.userId) {
-                throw new HTTPException(401, {
-                    res: c.json({ error: 'Unauthorized' }, 401),
-                })
-            }
-
-            const [data] = await db.insert(categories).values({
-                id: createId(),
-                userId: auth.userId,
-                ...value,
-            }).returning()
-
-            return c.json({ data })
-        })
-    .post('/bulk-delete',
-        clerkMiddleware(),
-        zValidator('json',
-            z.object({
-                ids: z.array(z.string())
-            })
-        ),
-        async (c) => {
-            const auth = getAuth(c);
-
-            const value = c.req.valid('json');
-            if (!auth?.userId) {
-                throw new HTTPException(401, {
-                    res: c.json({ error: 'Unauthorized' }, 401),
-                })
-            }
-
-            const data = await db
-                .delete(categories)
-                .where(
-                    and(
-                        eq(categories.userId, auth.userId),
-                        inArray(categories.id, value.ids)
-                    )
-                )
-                .returning({
-                    id: categories.id,
-                })
-
             return c.json({ data })
         }
     )
@@ -185,4 +132,59 @@ const app = new Hono()
             return c.json({ data })
         }
     )
+    .post('/',
+        clerkMiddleware(),
+        zValidator('json', insertCategorieSchema.pick({ name: true })),
+        async (c) => {
+            const auth = getAuth(c);
+
+            const value = c.req.valid('json');
+            if (!auth?.userId) {
+                throw new HTTPException(401, {
+                    res: c.json({ error: 'Unauthorized' }, 401),
+                })
+            }
+
+            const [data] = await db.insert(categories).values({
+                id: createId(),
+                userId: auth.userId,
+                ...value,
+            }).returning()
+
+            return c.json({ data })
+        }
+    )
+    .post('/bulk-delete',
+        clerkMiddleware(),
+        zValidator('json',
+            z.object({
+                ids: z.array(z.string())
+            })
+        ),
+        async (c) => {
+            const auth = getAuth(c);
+
+            const value = c.req.valid('json');
+            if (!auth?.userId) {
+                throw new HTTPException(401, {
+                    res: c.json({ error: 'Unauthorized' }, 401),
+                })
+            }
+
+            const data = await db
+                .delete(categories)
+                .where(
+                    and(
+                        eq(categories.userId, auth.userId),
+                        inArray(categories.id, value.ids)
+                    )
+                )
+                .returning({
+                    id: categories.id,
+                })
+
+            return c.json({ data })
+        }
+    )
+
 export default app; 

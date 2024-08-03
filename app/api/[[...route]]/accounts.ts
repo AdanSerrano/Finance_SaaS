@@ -10,8 +10,7 @@ import { z } from 'zod';
 import { zValidator } from '@hono/zod-validator';
 
 const app = new Hono()
-    .get(
-        '/',
+    .get('/',
         clerkMiddleware(),
         async (c) => {
             const auth = getAuth(c);
@@ -28,58 +27,6 @@ const app = new Hono()
             })
                 .from(accounts)
                 .where(eq(accounts.userId, auth.userId))
-            return c.json({ data })
-        })
-    .post('/',
-        clerkMiddleware(),
-        zValidator('json', insertAccountSchema.pick({ name: true })),
-        async (c) => {
-            const auth = getAuth(c);
-
-            const value = c.req.valid('json');
-            if (!auth?.userId) {
-                throw new HTTPException(401, {
-                    res: c.json({ error: 'Unauthorized' }, 401),
-                })
-            }
-
-            const [data] = await db.insert(accounts).values({
-                id: createId(),
-                userId: auth.userId,
-                ...value,
-            }).returning()
-
-            return c.json({ data })
-        })
-    .post('/bulk-delete',
-        clerkMiddleware(),
-        zValidator('json',
-            z.object({
-                ids: z.array(z.string())
-            })
-        ),
-        async (c) => {
-            const auth = getAuth(c);
-
-            const value = c.req.valid('json');
-            if (!auth?.userId) {
-                throw new HTTPException(401, {
-                    res: c.json({ error: 'Unauthorized' }, 401),
-                })
-            }
-
-            const data = await db
-                .delete(accounts)
-                .where(
-                    and(
-                        eq(accounts.userId, auth.userId),
-                        inArray(accounts.id, value.ids)
-                    )
-                )
-                .returning({
-                    id: accounts.id,
-                })
-
             return c.json({ data })
         }
     )
@@ -185,4 +132,59 @@ const app = new Hono()
             return c.json({ data })
         }
     )
+    .post('/',
+        clerkMiddleware(),
+        zValidator('json', insertAccountSchema.pick({ name: true })),
+        async (c) => {
+            const auth = getAuth(c);
+
+            const value = c.req.valid('json');
+            if (!auth?.userId) {
+                throw new HTTPException(401, {
+                    res: c.json({ error: 'Unauthorized' }, 401),
+                })
+            }
+
+            const [data] = await db.insert(accounts).values({
+                id: createId(),
+                userId: auth.userId,
+                ...value,
+            }).returning()
+
+            return c.json({ data })
+        }
+    )
+    .post('/bulk-delete',
+        clerkMiddleware(),
+        zValidator('json',
+            z.object({
+                ids: z.array(z.string())
+            })
+        ),
+        async (c) => {
+            const auth = getAuth(c);
+
+            const value = c.req.valid('json');
+            if (!auth?.userId) {
+                throw new HTTPException(401, {
+                    res: c.json({ error: 'Unauthorized' }, 401),
+                })
+            }
+
+            const data = await db
+                .delete(accounts)
+                .where(
+                    and(
+                        eq(accounts.userId, auth.userId),
+                        inArray(accounts.id, value.ids)
+                    )
+                )
+                .returning({
+                    id: accounts.id,
+                })
+
+            return c.json({ data })
+        }
+    )
+
 export default app; 
