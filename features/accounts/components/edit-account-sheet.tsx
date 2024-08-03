@@ -6,26 +6,45 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '
 import { Loader2 } from 'lucide-react'
 import React from 'react'
 import { UseConfirm } from '@/hooks/use-confirm'
-import { toast } from 'sonner'
-import { useCreateAccount } from '@/features/accounts/api/use-create-accounts'
+import { useDeleteAccount } from '../api/use-delete-account'
+import { useEditAccount } from '../api/use-edit-account'
 import { useGetAccount } from '@/features/accounts/api/use-get-account'
 import { useOpenAccount } from '@/features/accounts/hooks/use-open-account'
 
 export const EditAccountSheet = () => {
     const { isOpen, onClose, id } = useOpenAccount()
-
-    const mutation = useCreateAccount()
+    const [ConfirmDialog, confirm] = UseConfirm(
+        "Delete",
+        "Are you sure you want to delete this transaction?"
+    )
 
     const accountQuery = useGetAccount(id)
+
+    const editMutation = useEditAccount(id)
+    const deleteMutation = useDeleteAccount(id)
+
+    const isPending = editMutation.isPending || deleteMutation.isPending;
 
     const isLoading = accountQuery.isLoading;
 
     const onSubmit = (values: FormValues) => {
-        mutation.mutate(values, {
+        editMutation.mutate(values, {
             onSuccess: () => {
                 onClose()
             }
         })
+    }
+
+    const onDelete = async () => {
+        const ok = await confirm()
+
+        if (ok) {
+            deleteMutation.mutate(undefined, {
+                onSuccess: () => {
+                    onClose()
+                }
+            })
+        }
     }
 
     const defaultValues = accountQuery.data ? {
@@ -36,6 +55,7 @@ export const EditAccountSheet = () => {
 
     return (
         <>
+            <ConfirmDialog />
             <Sheet open={isOpen} onOpenChange={onClose}>
                 <SheetContent className='space-y-4'>
                     <SheetHeader>
@@ -54,8 +74,9 @@ export const EditAccountSheet = () => {
                         <AccountForm
                             id={id}
                             onSubmit={onSubmit}
-                            disabled={mutation.isPending}
+                            disabled={isPending}
                             defaultValues={defaultValues}
+                            onDelete={onDelete}
                         />
                     )}
                 </SheetContent>
