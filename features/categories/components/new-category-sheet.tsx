@@ -1,17 +1,17 @@
 'use client'
 
-import { AccountForm, FormValues } from '@/features/accounts/components/account-form'
+import { CategoriesForm, FormValues } from '@/features/categories/components/categories-form'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 
 import React from 'react'
 import { toast } from 'sonner'
-import { useCreateAccount } from '@/features/accounts/api/use-create-accounts'
-import { useNewAccount } from '@/features/accounts/hooks/use-new-account'
+import { useCreateCategory } from '@/features/categories/api/use-create-category'
+import { useNewCategories } from '../hooks/use-new-categories'
 
-export const NewAccountSheet = () => {
-    const { isOpen, onClose } = useNewAccount()
+export const NewCategorytSheet = () => {
+    const { isOpen, onClose } = useNewCategories()
 
-    const mutation = useCreateAccount()
+    const mutation = useCreateCategory()
 
     const onSubmit = (values: FormValues) => {
         mutation.mutate(values, {
@@ -29,13 +29,13 @@ export const NewAccountSheet = () => {
             <SheetContent className='space-y-4'>
                 <SheetHeader>
                     <SheetTitle>
-                        New Account
+                        New Category
                     </SheetTitle>
                     <SheetDescription>
-                        Create a new account to track your transaction.
+                        Create a new category to track your transaction.
                     </SheetDescription>
                 </SheetHeader>
-                <AccountForm
+                <CategoriesForm
                     onSubmit={onSubmit}
                     disabled={mutation.isPending}
                     defaultValues={{

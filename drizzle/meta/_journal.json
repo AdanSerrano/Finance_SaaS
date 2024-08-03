@@ -15,6 +15,13 @@
       "when": 1722460036508,
       "tag": "0001_illegal_squirrel_girl",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1722649117177,
+      "tag": "0002_shallow_sentinel",
+      "breakpoints": true
     }
   ]
 }

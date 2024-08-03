@@ -15,3 +15,16 @@ const customSchema = {
 };
 
 export const insertAccountSchema = createInsertSchema(accounts).extend(customSchema);
+
+export const categories = pgTable("categories", {
+    id: text("id").primaryKey(),
+    plaidId: text("plaid_id"),
+    name: text("name").notNull(),
+    userId: text("user_id").notNull(),
+});
+
+const categoriesSchema = {
+    name: z.string().min(1, "Name cannot be empty")
+};
+
+export const insertCategorieSchema = createInsertSchema(categories).extend(categoriesSchema);
