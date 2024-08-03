@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { DataTable } from '@/components/data-table'
 import { Skeleton } from '@/components/ui/skeleton'
 import { columns } from '@/app/(dashboard)/accounts/components/columns'
-import { useBulkDeleteAccounts } from '@/features/accounts/api/use-bulk-delete'
+import { useBulkDeleteAccounts } from '@/features/accounts/api/use-bulk-delete-accounts'
 import { useGetAccounts } from '@/features/accounts/api/use-get-accounts'
 import { useNewAccount } from '@/features/accounts/hooks/use-new-account'
 

@@ -20,7 +20,7 @@ export const useDeleteCategory = (id?: string) => {
         },
         onSuccess: () => {
             toast.success("Category deleted")
-            queryClient.invalidateQueries({ queryKey: ["categories", { id }] })
+            queryClient.invalidateQueries({ queryKey: ["category", { id }] })
             queryClient.invalidateQueries({ queryKey: ["categories"] })
             // TODO: invalidate summary and transactions
         },

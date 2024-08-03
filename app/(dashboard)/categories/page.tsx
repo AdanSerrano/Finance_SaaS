@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { DataTable } from '@/components/data-table'
 import { Skeleton } from '@/components/ui/skeleton'
 import { columns } from '@/app/(dashboard)/categories/components/columns'
-import { useBulkDeleteCategories } from '@/features/categories/api/use-bulk-delete'
+import { useBulkDeleteCategories } from '@/features/categories/api/use-bulk-delete-categories'
 import { useGetCategories } from '@/features/categories/api/use-get-categories'
 import { useNewCategories } from '@/features/categories/hooks/use-new-categories'
 

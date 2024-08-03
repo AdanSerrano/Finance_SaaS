@@ -80,7 +80,7 @@ export const AccountForm = ({ id, defaultValues, onSubmit, onDelete, disabled }:
                             type='button'
                             disabled={disabled}
                             onClick={handleDelete}
-                            className="w-full"
+                            className="w-full text-red-500 focus:text-red-700 hover:text-red-700"
                             variant={'outline'}
                             size={'icon'}
                         >

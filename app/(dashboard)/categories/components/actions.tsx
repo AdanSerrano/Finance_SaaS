@@ -16,7 +16,7 @@ interface Props {
 export const Actions = ({ id }: Props) => {
     const [ConfirmationDialog, confirm] = UseConfirm(
         "Delete",
-        "Are you sure you want to delete this account?"
+        "Are you sure you want to delete this category?"
     )
     const deleteMutation = useDeleteCategory(id)
     const { onOpen } = useOpenCategory()
