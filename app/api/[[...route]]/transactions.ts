@@ -55,7 +55,7 @@ const app = new Hono()
                 .where(
                     and(
                         accountId ? eq(transactions.accountId, accountId) : undefined,
-                        eq(transactions.userId, auth.userId),
+                        eq(accounts.userId, auth.userId),
                         gte(transactions.date, startDate),
                         lte(transactions.date, endDate),
                     )
@@ -211,6 +211,7 @@ const app = new Hono()
 
             const [data] = await db.insert(transactions).values({
                 id: createId(),
+                userId: auth.userId,
                 ...value,
             }).returning()
 
@@ -235,6 +236,7 @@ const app = new Hono()
             const data = await db.insert(transactions).values(
                 values.map((value) => ({
                     id: createId(),
+                    userId: auth.userId,
                     ...value,
                 }))
             ).returning()

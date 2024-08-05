@@ -1,31 +1,31 @@
 'use client'
 
-import { AccountForm, FormValues } from '@/features/accounts/components/account-form'
+import { FormValues, TransactionForm } from '@/features/transactions/components/transaction-form'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 
 import { Loader2 } from 'lucide-react'
 import React from 'react'
 import { UseConfirm } from '@/hooks/use-confirm'
-import { useDeleteAccount } from '../api/use-delete-account'
-import { useEditAccount } from '../api/use-edit-transaction'
-import { useGetAccount } from '@/features/accounts/api/use-get-account'
-import { useOpenAccount } from '@/features/accounts/hooks/use-open-account'
+import { useDeleteTransaction } from '@/features/transactions/api/use-delete-transaction'
+import { useEditTransaction } from '@/features/transactions/api/use-edit-transaction'
+import { useGetTransaction } from '@/features/transactions/api/use-get-transaction'
+import { useOpenTransaction } from '@/features/transactions/hooks/use-open-transaction'
 
-export const EditAccountSheet = () => {
-    const { isOpen, onClose, id } = useOpenAccount()
+export const EditTransactionSheet = () => {
+    const { isOpen, onClose, id } = useOpenTransaction()
     const [ConfirmDialog, confirm] = UseConfirm(
         "Delete",
         "Are you sure you want to delete this transaction?"
     )
 
-    const accountQuery = useGetAccount(id)
+    const transactionQuery = useGetTransaction(id)
 
-    const editMutation = useEditAccount(id)
-    const deleteMutation = useDeleteAccount(id)
+    const editMutation = useEditTransaction(id)
+    const deleteMutation = useDeleteTransaction(id)
 
     const isPending = editMutation.isPending || deleteMutation.isPending;
 
-    const isLoading = accountQuery.isLoading;
+    const isLoading = transactionQuery.isLoading;
 
     const onSubmit = (values: FormValues) => {
         editMutation.mutate(values, {
@@ -47,10 +47,22 @@ export const EditAccountSheet = () => {
         }
     }
 
-    const defaultValues = accountQuery.data ? {
-        name: accountQuery.data.name
+    const defaultValues = transactionQuery.data ? {
+        id: transactionQuery.data.id,
+        date: new Date(transactionQuery.data.date),
+        accountId: transactionQuery.data.accountId,
+        categoryId: transactionQuery.data.categoryId,
+        payee: transactionQuery.data.payee,
+        amount: transactionQuery.data.amount,
+        notes: transactionQuery.data.notes
     } : {
-        name: ""
+        id: "",
+        date: new Date(),
+        accountId: "",
+        categoryId: "",
+        payee: "",
+        amount: "",
+        notes: ""
     }
 
     return (
@@ -60,10 +72,10 @@ export const EditAccountSheet = () => {
                 <SheetContent className='space-y-4'>
                     <SheetHeader>
                         <SheetTitle>
-                            Edit Account
+                            Edit Transaction
                         </SheetTitle>
                         <SheetDescription>
-                            Edit an existing account.
+                            Edit an existing transaction.
                         </SheetDescription>
                     </SheetHeader>
                     {isLoading ? (
@@ -71,7 +83,7 @@ export const EditAccountSheet = () => {
                             <Loader2 className='size-4 text-muted-foreground animate-spin' />
                         </div>
                     ) : (
-                        <AccountForm
+                        <TransactionForm
                             id={id}
                             onSubmit={onSubmit}
                             disabled={isPending}
