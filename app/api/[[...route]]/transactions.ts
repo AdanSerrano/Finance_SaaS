@@ -66,48 +66,53 @@ const app = new Hono()
         }
     )
     .get('/:id',
+        zValidator("param", z.object({ id: z.string().optional() })),
         clerkMiddleware(),
-        zValidator("param", z.object({ id: z.string() })),
         async (c) => {
-            const auth = getAuth(c);
-            const { id } = c.req.valid("param")
+            try {
+                const auth = getAuth(c);
+                const { id } = c.req.valid("param");
 
-            if (!id) {
-                return c.json({ error: 'Bad request' }, 400)
+                if (!id) {
+                    return c.json({ error: 'Bad request' }, 400);
+                }
+
+                if (!auth?.userId) {
+                    throw new HTTPException(401, {
+                        res: c.json({ error: 'Unauthorized' }, 401),
+                    });
+                }
+
+                const [data] = await db
+                    .select({
+                        id: transactions.id,
+                        date: transactions.date,
+                        categoryId: transactions.categoryId,
+                        payee: transactions.payee,
+                        amount: transactions.amount,
+                        notes: transactions.notes,
+                        accountId: transactions.accountId,
+                    })
+                    .from(transactions)
+                    .innerJoin(accounts, eq(transactions.accountId, accounts.id))
+                    .where(
+                        and(
+                            eq(transactions.id, id),
+                            eq(accounts.userId, auth.userId),
+                        ),
+                    );
+
+                if (!data) {
+                    return c.json({ error: 'Not found' }, 404);
+                }
+
+                return c.json({ data });
+            } catch (error) {
+                console.error(`Error fetching transaction by id`, error);
+                throw new HTTPException(500, {
+                    res: c.json({ error: 'Internal Server Error' }, 500),
+                });
             }
-
-            if (!auth?.userId) {
-                throw new HTTPException(401, {
-                    res: c.json({ error: 'Unauthorized' }, 401),
-                })
-            }
-
-            const [data] = await db
-                .select({
-                    id: transactions.id,
-                    category: categories.name,
-                    date: transactions.date,
-                    categoryId: transactions.categoryId,
-                    payee: transactions.payee,
-                    amount: transactions.amount,
-                    notes: transactions.notes,
-                    account: accounts.name,
-                    accountId: transactions.accountId,
-                })
-                .from(transactions)
-                .innerJoin(accounts, eq(transactions.accountId, accounts.id))
-                .where(
-                    and(
-                        eq(transactions.id, id),
-                        eq(accounts.userId, auth.userId),
-                    ),
-                );
-
-            if (!data) {
-                return c.json({ error: 'Not found' }, 404)
-            }
-
-            return c.json({ data })
         }
     )
     .patch('/:id',

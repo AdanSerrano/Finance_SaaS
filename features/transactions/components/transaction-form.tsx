@@ -186,7 +186,7 @@ export const TransactionForm = ({ id,
                                     <Textarea
                                         {...field}
                                         disabled={disabled}
-                                        placeholder="Optional payee"
+                                        placeholder="Optional notes"
                                         value={field.value ?? ''}
                                     />
                                 </FormControl>

@@ -54,7 +54,7 @@ export default function TransactionsPage() {
                 <CardContent>
                     <DataTable
                         columns={columns}
-                        data={[]}
+                        data={transactions}
                         filterKey=''
                         onDelete={(row) => {
                             const ids = row.map((r) => r.original.id)

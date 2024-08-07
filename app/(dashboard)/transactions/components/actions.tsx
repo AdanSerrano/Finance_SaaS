@@ -6,8 +6,8 @@ import { Edit, MoreHorizontal, Trash } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu"
 import { UseConfirm } from "@/hooks/use-confirm"
-import { useDeleteCategory } from "@/features/categories/api/use-delete-category"
-import { useOpenCategory } from "@/features/categories/hooks/use-open-category"
+import { useDeleteTransaction } from "@/features/transactions/api/use-delete-transaction"
+import { useOpenTransaction } from "@/features/transactions/hooks/use-open-transaction"
 
 interface Props {
     id: string
@@ -16,10 +16,10 @@ interface Props {
 export const Actions = ({ id }: Props) => {
     const [ConfirmationDialog, confirm] = UseConfirm(
         "Delete",
-        "Are you sure you want to delete this category?"
+        "Are you sure you want to delete this transaction?"
     )
-    const deleteMutation = useDeleteCategory(id)
-    const { onOpen } = useOpenCategory()
+    const deleteMutation = useDeleteTransaction(id)
+    const { onOpen } = useOpenTransaction()
 
     const onDelete = async () => {
         const ok = await confirm()
