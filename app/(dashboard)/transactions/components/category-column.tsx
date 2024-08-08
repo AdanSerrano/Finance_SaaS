@@ -1,8 +1,11 @@
 import { Triangle, TriangleAlert } from 'lucide-react'
 
+import { EditTransactionSheet } from '@/features/transactions/components/edit-transaction-sheet'
 import React from 'react'
 import { cn } from '@/lib/utils'
+import { useEditTransaction } from '@/features/transactions/api/use-edit-transaction'
 import { useOpenCategory } from '@/features/categories/hooks/use-open-category'
+import { useOpenTransaction } from '@/features/transactions/hooks/use-open-transaction'
 
 interface CategoryColumnProps {
     id: string
@@ -11,14 +14,18 @@ interface CategoryColumnProps {
 }
 
 export const CategoryColumn = ({
+    id,
     category,
     categoryId
 }: CategoryColumnProps) => {
     const { onOpen: onOpenCategory } = useOpenCategory()
+    const { onOpen } = useOpenTransaction()
 
     const onClick = () => {
         if (categoryId) {
             onOpenCategory(categoryId)
+        } else {
+            onOpen(id)
         }
     }
     return (

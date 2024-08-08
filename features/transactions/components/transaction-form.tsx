@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button"
 import { DatePicker } from "@/components/date-picker"
 import { Input } from "@/components/ui/input"
 import React from 'react'
-import { ReactSelect } from "@/components/select"
+import { ReactSelect } from "@/components/ReactSelect"
 import { Textarea } from "@/components/ui/textarea"
 import { Trash } from 'lucide-react'
 import { insertTransactionsSchemas } from '@/db/schema'

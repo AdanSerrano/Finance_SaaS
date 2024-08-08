@@ -7,11 +7,16 @@ import { Button } from '@/components/ui/button'
 import { DataTable } from '@/components/data-table'
 import { ImportCard } from './components/import-card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { transactions as TransactionsSchemas } from '@/db/schema'
 import { UploadButton } from './components/upload-button'
 import { columns } from '@/app/(dashboard)/transactions/components/columns'
+import { create } from 'zustand'
+import { toast } from 'sonner'
+import { useBulkCreateTransactions } from '@/features/transactions/api/use-bulk-create-transactions'
 import { useBulkDeleteTransactions } from '@/features/transactions/api/use-bulk-delete-transactions'
 import { useGetTransactions } from '@/features/transactions/api/use-get-transactions'
 import { useNewTransaction } from '@/features/transactions/hooks/use-new-transaction'
+import { useSelectAccount } from '@/hooks/use-select-account'
 import { useState } from 'react'
 
 enum VARIANT {
@@ -26,6 +31,7 @@ const INITIAL_IMPORT_RESULTS = {
 }
 
 export default function TransactionsPage() {
+    const [AccountDialog, confirm] = useSelectAccount()
     const [variant, setVariant] = useState<VARIANT>(VARIANT.LIST)
     const [importResults, setImportResults] = useState(INITIAL_IMPORT_RESULTS)
 
@@ -40,11 +46,36 @@ export default function TransactionsPage() {
     }
 
     const newTransaction = useNewTransaction();
+    const createTransactions = useBulkCreateTransactions()
     const deleteTransactions = useBulkDeleteTransactions()
     const transactionsQuery = useGetTransactions()
     const transactions = transactionsQuery.data || []
 
     const isDisabled = deleteTransactions.isPending || transactionsQuery.isLoading
+
+    const onSubmitImport = async (values: typeof TransactionsSchemas.$inferInsert[]) => {
+        const accountId = await confirm()
+
+        if (!accountId) {
+            return toast.error('Please select an account to continue.')
+        }
+        const data = values.map((values) => ({
+            ...values,
+            accountId: accountId as string
+        }))
+
+
+        const onCreate = createTransactions.mutate(data, {
+            onSuccess: () => {
+                onCancelImport()
+            }
+        })
+
+
+        console.log('values', { values })
+        console.log('accountId', accountId)
+        console.log('onCreate', onCreate)
+    }
 
     if (transactionsQuery.isLoading) {
         return (
@@ -66,10 +97,11 @@ export default function TransactionsPage() {
     if (variant === VARIANT.IMPORT) {
         return (
             <>
+                <AccountDialog />
                 <ImportCard
                     data={importResults.data}
                     onCancel={onCancelImport}
-                    onSubmit={() => { }}
+                    onSubmit={onSubmitImport}
                 />
             </>
         )
@@ -82,10 +114,11 @@ export default function TransactionsPage() {
                     <CardTitle className='text-xl line-clamp-1'>
                         Transactions Page
                     </CardTitle>
-                    <div className='flex items-center gap-x-2'>
+                    <div className='flex flex-col sm:flex-row gap-y-2 items-center gap-x-2'>
                         <Button
                             size={'sm'}
                             onClick={newTransaction.onOpen}
+                            className='w-full lg:w-auto'
                         >
                             <Plus className='size-4 mr-2' />
                             Add new
