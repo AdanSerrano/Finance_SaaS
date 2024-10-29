@@ -76,7 +76,8 @@
   },
   "devDependencies": {
     "dotenv": "^16.4.5",
-    "eslint": "^9.9.0",
-    "typescript": "5.5.4"
+    "eslint": "^8.56.0",
+    "eslint-config-next": "^14.1.0",
+    "typescript": "^5.3.3"
   }
 }

@@ -1,5 +1,6 @@
 import { DataCharts } from "@/components/dashboard/data-charts";
 import { DataGrid } from "@/components/dashboard/data-grid";
+import React from "react";
 
 export default function DashboardPage() {
   return (
